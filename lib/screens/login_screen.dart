@@ -39,8 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', _userController.text);
         await prefs.setString('password', _passController.text);
-        await prefs.setString('session_id', data['session_id'] ?? ''); // ذخیره سشن
-        await prefs.setInt('user_id', data['user_id'] ?? 0); // ذخیره آیدی کاربر
+        await prefs.setString('session_id', data['session_id'] ?? '');
+        await prefs.setInt('user_id', data['user_id'] ?? 0);
 
         if (mounted) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
