@@ -1,5 +1,5 @@
 name: parvaz_app
-description: Parvaz Messenger
+description: "Parvaz Chat Application"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,8 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.2.1
   intl: ^0.18.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
