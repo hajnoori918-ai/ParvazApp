@@ -24,14 +24,21 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await http.post(
         Uri.parse('https://noorir.isfpardaz.ir/api.php'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Dart/2.17 (dart:io)', // این خط به هاست میگه درخواست از اپه
+        },
         body: {
           'action': 'login',
           'username': _userController.text,
           'password': _passController.text,
           'mode': 'login',
-          'app_mode': '1', // این خط برای شناسایی اپلیکیشن اضافه شد
+          'app_mode': '1',
         },
       );
+
+      // این چاپ برای اینه که اگه ارور داد، بفهمیم سرور چی برگردونده
+      print("سرور جواب داد: " + response.body);
 
       final data = jsonDecode(response.body);
 
@@ -49,7 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _err = data['message'] ?? 'خطا در ورود');
       }
     } catch (e) {
-      setState(() => _err = 'خطا در ارتباط با سرور');
+      // این خط دقیقاً میگه چه خبره
+      setState(() => _err = 'خطای واقعی: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -94,7 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                if (_err.isNotEmpty) Text(_err, style: const TextStyle(color: Colors.redAccent)),
+                if (_err.isNotEmpty) Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(_err, textAlign: TextAlign.center, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+                ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
