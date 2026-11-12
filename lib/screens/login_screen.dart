@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'username': _userController.text,
           'password': _passController.text,
           'mode': 'login',
+          'app_mode': '1', // این خط برای شناسایی اپلیکیشن اضافه شد
         },
       );
 
@@ -38,6 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', _userController.text);
         await prefs.setString('password', _passController.text);
+        await prefs.setString('session_id', data['session_id'] ?? ''); // ذخیره سشن
+        await prefs.setInt('user_id', data['user_id'] ?? 0); // ذخیره آیدی کاربر
 
         if (mounted) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
