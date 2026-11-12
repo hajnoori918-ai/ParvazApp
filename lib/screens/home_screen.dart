@@ -24,20 +24,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadChats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username') ?? '';
+      final sessionId = prefs.getString('session_id') ?? '';
 
       final response = await http.post(
         Uri.parse('https://noorir.isfpardaz.ir/api.php'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Dart/2.17 (dart:io)',
+          'X-Session-ID': sessionId, // ارسال سشن آیدی
+        },
         body: {
           'action': 'chat_list',
-          'username': username,
+          'app_mode': '1',
         },
       );
       final data = jsonDecode(response.body);
       
       if (data['status'] == 'ok') {
         setState(() {
-          chats = data['items'];
+          chats = data['items'] ?? [];
           _loading = false;
         });
       } else {
@@ -56,21 +61,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _loading 
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: chats.length,
-              itemBuilder: (context, index) {
-                final chat = chats[index];
-                return ListTile(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(chat: chat))),
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blueAccent,
-                    child: Text((chat['name'] ?? 'U')[0]),
-                  ),
-                  title: Text(chat['name'] ?? 'چت', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(chat['last'] != null ? chat['last']['text'] : 'بدون پیام', maxLines: 1, overflow: TextOverflow.ellipsis),
-                );
-              },
-            ),
+          : chats.isEmpty
+              ? const Center(child: Text('هیچ چتی وجود ندارد', style: TextStyle(color: Colors.grey)))
+              : ListView.builder(
+                  itemCount: chats.length,
+                  itemBuilder: (context, index) {
+                    final chat = chats[index];
+                    return ListTile(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(chat: chat))),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blueAccent,
+                        child: Text((chat['name'] ?? 'U')[0]),
+                      ),
+                      title: Text(chat['name'] ?? 'چت', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(chat['last'] != null ? chat['last']['text'] : 'بدون پیام', maxLines: 1, overflow: TextOverflow.ellipsis),
+                    );
+                  },
+                ),
     );
   }
 }
