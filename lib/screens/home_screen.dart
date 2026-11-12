@@ -30,10 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } else {
       setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res['message'] ?? 'خطا در دریافت چت‌ها')));
+      }
     }
   }
 
-  // تابع برای تشخیص آواتار و نام
   String _getChatName(dynamic chat) {
     if (chat['t'] == 'p') {
       String uid = chat['uid'].toString();
@@ -43,10 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _getAvatarText(dynamic chat) {
-    return _getChatName(chat).toString().substring(0, 1).toUpperCase();
+    final name = _getChatName(chat);
+    return name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
   }
 
-  // تابع برای پیش‌نمایش آخرین پیام
   String _getLastMessage(dynamic chat) {
     if (chat['last'] == null) return 'بدون پیام';
     String type = chat['last']['type'] ?? 'text';
@@ -59,39 +61,55 @@ class _HomeScreenState extends State<HomeScreen> {
     return text;
   }
 
+  String _getTime(dynamic chat) {
+    if (chat['last'] == null) return '';
+    int ts = chat['last']['ts'];
+    DateTime dt = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
+    return DateFormat('HH:mm').format(dt);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Parvaz', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 24)),
-          backgroundColor: Colors.white,
-          elevation: 1,
+          title: const Text('Parvaz'),
           actions: [
-            IconButton(icon: const Icon(Icons.search, color: Colors.grey), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
                 onRefresh: _fetchChats,
-                child: ListView.builder(
+                child: ListView.separated(
                   itemCount: _chats.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 80),
                   itemBuilder: (context, index) {
                     final chat = _chats[index];
                     final unread = chat['unread'] ?? 0;
-                    final isOnline = false; // می‌توانید بعداً منطق آنلاین بودن را اضافه کنید
+                    final isVerified = chat['ver'] == true;
                     
+                    // پیدا کردن عکس آواتار (برای گروه‌ها یا پیوی)
+                    String? avatarUrl;
+                    if (chat['t'] == 'p' && chat['uid'].toString() != '0') {
+                      final p = _users[chat['uid'].toString()]?['p'];
+                      if (p != null && p != '') avatarUrl = 'https://noorir.isfpardaz.ir/uploads/$p';
+                    } else if (chat['av'] != null && chat['av'] != '') {
+                      avatarUrl = 'https://noorir.isfpardaz.ir/${chat['av']}';
+                    }
+
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       leading: CircleAvatar(
                         radius: 28,
                         backgroundColor: Colors.blue,
-                        child: Text(
+                        backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                        child: avatarUrl == null ? Text(
                           _getAvatarText(chat),
                           style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
+                        ) : null,
                       ),
                       title: Row(
                         children: [
@@ -103,43 +121,46 @@ class _HomeScreenState extends State<HomeScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (chat['ver'] == true) 
-                            const Icon(Icons.verified, color: Colors.blue, size: 16),
+                          if (isVerified) 
+                            const Padding(
+                              padding: EdgeInsets.only(right: 4),
+                              child: Icon(Icons.verified, color: Colors.blue, size: 16),
+                            ),
                         ],
                       ),
                       subtitle: Text(
                         _getLastMessage(chat),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: unread > 0 ? Colors.black87 : Colors.grey),
+                        style: TextStyle(color: unread > 0 ? Colors.black87 : Colors.grey[600]),
                       ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            chat['last'] != null 
-                                ? DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(chat['last']['ts'] * 1000))
-                                : '',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            _getTime(chat),
+                            style: TextStyle(fontSize: 12, color: unread > 0 ? Colors.blue : Colors.grey),
                           ),
                           const SizedBox(height: 4),
                           if (unread > 0)
                             Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
                                 color: Colors.blue,
-                                shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 unread.toString(),
                                 style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                               ),
-                            ),
+                            )
+                          else
+                            const SizedBox(height: 18),
                         ],
                       ),
                       onTap: () {
-                        // اینجا بعداً صفحه چت را باز می‌کنیم
+                        // اینجا بعداً برای باز کردن صفحه چت کد می‌نویسیم
                       },
                     );
                   },
@@ -147,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color(0xFF3390ec),
           child: const Icon(Icons.edit, color: Colors.white),
         ),
       ),
