@@ -26,9 +26,13 @@ jobs:
     - name: Create Android Folder
       run: flutter create --platforms=android .
 
-    - name: Add Internet Permission
+    # این بخش جدید اضافه شده تا باگ image_picker رو دور بزنه
+    - name: Disable Lint Bug
       run: |
-        sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET" \/>\n    <application/' android/app/src/main/AndroidManifest.xml
+        echo '<?xml version="1.0" encoding="UTF-8"?>
+        <lint>
+            <issue id="CommentDetector" severity="ignore" />
+        </lint>' > android/app/lint.xml
 
     - name: Get dependencies
       run: flutter pub get
