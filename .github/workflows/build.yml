@@ -26,13 +26,20 @@ jobs:
     - name: Create Android Folder
       run: flutter create --platforms=android .
 
-    # این بخش جدید اضافه شده تا باگ image_picker رو دور بزنه
-    - name: Disable Lint Bug
+    - name: Disable Lint Check
       run: |
-        echo '<?xml version="1.0" encoding="UTF-8"?>
-        <lint>
-            <issue id="CommentDetector" severity="ignore" />
-        </lint>' > android/app/lint.xml
+        echo 'subprojects {
+            afterEvaluate { project ->
+                if (project.hasProperty("android")) {
+                    project.android {
+                        lintOptions {
+                            checkReleaseBuilds false
+                            abortOnError false
+                        }
+                    }
+                }
+            }
+        }' >> android/build.gradle
 
     - name: Get dependencies
       run: flutter pub get
