@@ -28,6 +28,7 @@ class PTheme {
     this.hover = const Color(0x0F000000),
   });
 
+  /// --hbar: color-mix(accent 80%, #12202e)
   Color get hbar => Color.lerp(accent, const Color(0xFF12202E), 0.2)!;
 
   BoxDecoration get chatDecoration => BoxDecoration(color: chatColor, gradient: chatGradient);
@@ -235,6 +236,7 @@ String jalaliDay(DateTime d, {bool year = false}) {
   return '${fa(j[2])} ${_jMonths[j[1] - 1]}${year ? ' ${fa(j[0])}' : ''}';
 }
 
+/// زمان در لیست گفتگوها (مثل listTime سایت)
 String listTime(int ts) {
   final d = tsDate(ts), n = DateTime.now();
   if (dayKey(d) == dayKey(n)) return fmtTime(ts);
@@ -316,6 +318,7 @@ Future<bool> askConfirm(BuildContext c, String title, String msg, String ok, {bo
   return r == true;
 }
 
+/// برچسب کنار نام: تیک آبی یا نشان پریمیوم
 class NameBadge extends StatelessWidget {
   final Map<String, dynamic>? u;
   final double size;
@@ -340,6 +343,8 @@ class VerifiedTick extends StatelessWidget {
   Widget build(BuildContext context) => Padding(padding: const EdgeInsetsDirectional.only(start: 3), child: Icon(Icons.verified_rounded, size: size, color: const Color(0xFF1D9BF0)));
 }
 
+/// آواتار گرد با حلقه‌ی استوری و نقطه‌ی آنلاین.
+/// ring: 0 = بدون حلقه، 1 = دیده‌شده (خاکستری)، 2 = دیده‌نشده (آبی)
 class Avatar extends StatelessWidget {
   final double size;
   final int? uid;
