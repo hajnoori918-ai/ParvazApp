@@ -50,6 +50,7 @@ class ParvazApp extends StatelessWidget {
   }
 }
 
+/// بوت اولیه: گرفتن csrf و وضعیت ورود، سپس رفتن به ورود یا صفحه‌ی اصلی.
 class Splash extends StatefulWidget {
   const Splash({super.key});
   @override
@@ -90,9 +91,7 @@ class _SplashState extends State<Splash> {
       return;
     }
     applyCfg(j);
-    
-    // این خط تغییر کرد تا دیگر به ME نیاز نداشته باشد
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => (j['me'] == null) ? const LoginScreen() : const HomeScreen()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => ME.isEmpty ? const LoginScreen() : const HomeScreen()));
   }
 
   Future<void> _editServer() async {
@@ -125,16 +124,7 @@ class _SplashState extends State<Splash> {
         decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF2A9D8F), Color(0xFF264653)])),
         alignment: Alignment.center,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          // اینجا errorBuilder اضافه شد تا اگر عکس نبود، برنامه ارور نده
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22), 
-            child: Image.asset(
-              'assets/icon.png', 
-              width: 96, 
-              height: 96,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.send, size: 96, color: Colors.white),
-            )
-          ),
+          ClipRRect(borderRadius: BorderRadius.circular(22), child: Image.asset('assets/icon.png', width: 96, height: 96)),
           const SizedBox(height: 14),
           const Text('Parvaz', style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: .5)),
           const SizedBox(height: 26),
