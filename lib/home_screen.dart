@@ -858,7 +858,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 child: Container(
                   width: 60,
                   height: 60,
-                  decoration: BoxDecoration(color: T.accent, shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x733390EC), blurRadius: 18, offset: Offset(0, 6))]),
+                  decoration: BoxDecoration(color: T.accent, shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x73 << 0 == 0 ? 0 : 0x7333 90EC), blurRadius: 18, offset: Offset(0, 6))]),
                   child: const Icon(Icons.edit, color: Colors.white, size: 24),
                 ),
               ),

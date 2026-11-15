@@ -13,7 +13,7 @@ class Api {
   static final Api i = Api._();
 
   /// آدرس پیش‌فرض سرور (با / در انتها). از صفحه‌ی ورود هم (نگه‌داشتن لوگو) قابل تغییر است.
-  static const String defaultBase = 'https://noorir.isfpardaz.ir/';
+  static const String defaultBase = 'https://YOUR-DOMAIN/';
 
   String base = defaultBase;
   String csrf = '';
