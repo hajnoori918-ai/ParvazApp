@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // مخاطبین
   final _cq = TextEditingController();
   List<Map<String, dynamic>> contacts = [];
-  bool contactsBusy = false;
+  bool contactsBusy = false, _contactsLoaded = false;
 
   @override
   void initState() {
@@ -587,6 +586,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final qq = _cq.text.trim();
     final j = await Api.i.call(qq.isEmpty ? 'contacts_list' : 'members', {'q': qq, 'offset': 0});
     contactsBusy = false;
+    _contactsLoaded = true;
     if (j['status'] == 'ok' && mounted) {
       mergeUserList(j['list']);
       setState(() => contacts = (j['list'] as List).map(_m).toList());
@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Widget _contactsTab() {
-    if (contacts.isEmpty && !contactsBusy && _cq.text.isEmpty) _loadContacts();
+    if (!_contactsLoaded && !contactsBusy) _loadContacts();
     return Column(children: [
       _titleBar('مخاطبین'),
       Container(
@@ -858,7 +858,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 child: Container(
                   width: 60,
                   height: 60,
-                  decoration: BoxDecoration(color: T.accent, shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x73 << 0 == 0 ? 0 : 0x7333 90EC), blurRadius: 18, offset: Offset(0, 6))]),
+                  decoration: BoxDecoration(color: T.accent, shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x733390EC), blurRadius: 18, offset: Offset(0, 6))]),
                   child: const Icon(Icons.edit, color: Colors.white, size: 24),
                 ),
               ),
